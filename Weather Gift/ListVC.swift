@@ -10,7 +10,6 @@ import UIKit
 import GooglePlaces
 
 class ListVC: UIViewController {
-
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var editBarButton: UIBarButtonItem!
     @IBOutlet weak var addBarButton: UIBarButtonItem!
@@ -22,6 +21,7 @@ class ListVC: UIViewController {
         super.viewDidLoad()
         tableView.delegate = self
         tableView.dataSource = self
+        tableView.reloadData()
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -62,6 +62,9 @@ extension ListVC: UITableViewDelegate, UITableViewDataSource {
         return cell
     }
     
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    }
+    
     //MARK:- tableView Editing Functions
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
@@ -78,11 +81,11 @@ extension ListVC: UITableViewDelegate, UITableViewDataSource {
     
     //MARK:- tableView methods to freeze the first cell 
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        return (indexPath.row != 0 ? true : false)
+        return (indexPath.row == 0 ? false : true)
     }
     
     func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        return (indexPath.row != 0 ? true : false)
+        return (indexPath.row == 0 ? false : true)
     }
     
     //can we consider to be able to move from a target to a proposed destination??? - do we allow the move to happen???
@@ -91,15 +94,15 @@ extension ListVC: UITableViewDelegate, UITableViewDataSource {
     }
     
     func updateTable(place: GMSPlace) {
-        let newIndexPath = IndexPath(row: locationsArray.count, section: 0)
-        var newWeatherLocation = WeatherLocation()
+        let newWeatherLocation = WeatherLocation()
+        newWeatherLocation.name = place.name
         let latitude = place.coordinate.latitude
         let longitude = place.coordinate.longitude
-        newWeatherLocation.coordinates = "\(latitude), \(longitude)"
+        newWeatherLocation.coordinates = "\(latitude),\(longitude)"
         print(newWeatherLocation.coordinates)
         locationsArray.append(newWeatherLocation)
-        tableView.insertRows(at: [newIndexPath], with: .automatic)
-    }
+        tableView.reloadData()
+    }  
 }
 
 extension ListVC: GMSAutocompleteViewControllerDelegate {
